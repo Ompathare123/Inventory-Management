@@ -54,7 +54,13 @@ const elements = {
     editRecordId: document.getElementById('edit-record-id'),
     formName: document.getElementById('form-name'),
     formPhone: document.getElementById('form-phone'),
-    formFile: document.getElementById('form-file'),
+    formCameraFile: document.getElementById('form-camera-file'),
+    formGalleryFile: document.getElementById('form-gallery-file'),
+    actionSheetOverlay: document.getElementById('action-sheet-overlay'),
+    photoActionSheet: document.getElementById('photo-action-sheet'),
+    btnSourceCamera: document.getElementById('btn-source-camera'),
+    btnSourceGallery: document.getElementById('btn-source-gallery'),
+    btnSourceCancel: document.getElementById('btn-source-cancel'),
     uploadBox: document.getElementById('upload-box'),
     previewWrapper: document.getElementById('preview-wrapper'),
     imagePreview: document.getElementById('image-preview'),
@@ -406,7 +412,8 @@ function closeModal() {
 function resetPhotoPreview() {
     state.selectedPhotoBlob = null;
     state.existingPhotoUrl = '';
-    elements.formFile.value = '';
+    elements.formCameraFile.value = '';
+    elements.formGalleryFile.value = '';
     elements.imagePreview.src = '';
     elements.uploadBox.style.display = 'flex';
     elements.previewWrapper.style.display = 'none';
@@ -688,11 +695,33 @@ function setupEventListeners() {
     elements.modalOverlay.addEventListener('click', closeModal);
     elements.recordForm.addEventListener('submit', handleFormSubmit);
     
+    // Image selection source options sheet triggers
     elements.uploadBox.addEventListener('click', () => {
-        elements.formFile.click();
+        elements.actionSheetOverlay.classList.add('active');
+        elements.photoActionSheet.classList.add('active');
     });
-    
-    elements.formFile.addEventListener('change', handleImageSelect);
+
+    const closeActionSheet = () => {
+        elements.actionSheetOverlay.classList.remove('active');
+        elements.photoActionSheet.classList.remove('active');
+    };
+
+    elements.actionSheetOverlay.addEventListener('click', closeActionSheet);
+    elements.btnSourceCancel.addEventListener('click', closeActionSheet);
+
+    elements.btnSourceCamera.addEventListener('click', () => {
+        closeActionSheet();
+        elements.formCameraFile.click();
+    });
+
+    elements.btnSourceGallery.addEventListener('click', () => {
+        closeActionSheet();
+        elements.formGalleryFile.click();
+    });
+
+    // File change listeners
+    elements.formCameraFile.addEventListener('change', handleImageSelect);
+    elements.formGalleryFile.addEventListener('change', handleImageSelect);
     elements.removePreviewBtn.addEventListener('click', resetPhotoPreview);
     
     elements.closeZoom.addEventListener('click', closeZoomModal);
@@ -715,9 +744,9 @@ function setupEventListeners() {
         e.preventDefault();
         elements.uploadBox.classList.remove('drag-over');
         if (e.dataTransfer.files.length > 0) {
-            elements.formFile.files = e.dataTransfer.files;
+            elements.formGalleryFile.files = e.dataTransfer.files;
             const event = new Event('change');
-            elements.formFile.dispatchEvent(event);
+            elements.formGalleryFile.dispatchEvent(event);
         }
     });
 }
