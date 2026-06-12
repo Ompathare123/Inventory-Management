@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dal Management - Mobile Inventory</title>
+    <!-- Meta tags for SEO & PWA potential -->
+    <meta name="description" content="A premium mobile-first inventory management application for various dal types including Toor, Moong, Urad, Chana, and Masoor.">
+    <meta name="theme-color" content="#D97706">
+    <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+
+    <!-- Main Mobile Frame Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <!-- Back button is hidden on home view via JS -->
+                <button id="back-btn" class="back-btn" style="display: none;" aria-label="Go back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <h1 id="app-title" class="app-title">Dal Manager</h1>
+            </div>
+            <div class="header-right">
+                <span class="brand-badge">Premium</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="app-content">
+            
+            <!-- 1. HOME VIEW (Categories List) -->
+            <div id="home-view" class="view active">
+                <!-- Greeting / Dashboard Summary -->
+                <div class="hero-banner">
+                    <div class="hero-subtitle">Inventory Dashboard</div>
+                    <h2 class="hero-title">Track Dal stock by categories</h2>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span id="stat-total-records" class="stat-val">0</span>
+                            <span class="stat-label">Total People</span>
+                        </div>
+                        <div class="stat-item" style="border-left: 1px solid rgba(0,0,0,0.08); padding-left: 16px;">
+                            <span id="stat-last-updated" class="stat-val" style="font-size: 13px; font-weight: 600; line-height: 24px;">--</span>
+                            <span class="stat-label">Last Activity</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Select Dal Category</h3>
+                
+                <!-- Category Grid -->
+                <div class="category-grid" id="category-list">
+                    <!-- Dynamic rendering of categories in JS -->
+                </div>
+            </div>
+
+            <!-- 2. CATEGORY VIEW (List of people in specific dal type) -->
+            <div id="category-view" class="view">
+                <!-- Dynamic Category Description Banner -->
+                <div class="search-container">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search by name or phone..." aria-label="Search records">
+                    <button id="clear-search" class="clear-search-btn" aria-label="Clear search">
+                        &times;
+                    </button>
+                </div>
+
+                <!-- List of People Container -->
+                <div id="people-list" class="people-list">
+                    <!-- Dynamic rendering in JS -->
+                </div>
+
+                <!-- Floating Add Button (+) -->
+                <button id="fab-add" class="fab" aria-label="Add record">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+
+        </main>
+
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- sliding sheet MODAL OVERLAY -->
+        <div id="modal-overlay" class="modal-overlay"></div>
+
+        <!-- FORM BOTTOM SHEET -->
+        <div id="form-modal" class="modal-sheet">
+            <div class="sheet-handle"></div>
+            
+            <div class="modal-header">
+                <h3 class="modal-title" id="form-modal-title">Add New Entry</h3>
+                <button id="close-modal" class="close-modal-btn" aria-label="Close form">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="record-form">
+                <input type="hidden" id="edit-record-id">
+                
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label for="form-name" class="form-label">Name</label>
+                    <input type="text" id="form-name" class="form-input" placeholder="Enter person name" required autocomplete="name">
+                </div>
+
+                <!-- Phone Field -->
+                <div class="form-group">
+                    <label for="form-phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="form-phone" class="form-input" placeholder="Enter 10-digit number" required autocomplete="tel">
+                </div>
+
+                <!-- Bag Photo Upload Field -->
+                <div class="form-group">
+                    <label class="form-label">Bag Photo</label>
+                    
+                    <!-- File Input Box -->
+                    <div id="upload-box" class="upload-container">
+                        <svg class="upload-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <span class="upload-text">Upload Bag Photo</span>
+                        <span class="upload-subtext">Tap to select or capture camera image</span>
+                        <input type="file" id="form-file" class="hidden-file-input" accept="image/*">
+                    </div>
+
+                    <!-- Image Preview Area -->
+                    <div id="preview-wrapper" class="upload-preview-wrapper">
+                        <img id="image-preview" src="" alt="Bag photo preview" class="upload-preview">
+                        <button type="button" id="remove-preview-btn" class="remove-photo-btn" aria-label="Remove photo">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="button" id="btn-cancel" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" id="btn-save" class="btn btn-primary">Save Entry</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- FULLSCREEN IMAGE ZOOM MODAL -->
+        <div id="zoom-modal" class="fullscreen-photo-modal">
+            <button id="close-zoom" class="close-fullscreen-btn" aria-label="Close view">
+                &times;
+            </button>
+            <img id="zoom-img" src="" alt="Fullscreen bag photo" class="fullscreen-photo">
+        </div>
+
+        <!-- LOADING SPINNER OVERLAY -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="spinner-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-text" id="loading-text">Connecting to Supabase...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Application Logic -->
+    <script src="app.js?v=2"></script>
+</body>
+</html>

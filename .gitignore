@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Local Environment Credentials
+.env
+.env.local
+.env.*.local
+
+# Vercel Configuration files
+.vercel/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.system_generated/
