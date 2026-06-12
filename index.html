@@ -130,17 +130,15 @@
                 <div class="form-group">
                     <label class="form-label">Bag Photo</label>
                     
-                    <!-- File Input Box -->
                     <div id="upload-box" class="upload-container">
                         <svg class="upload-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                             <circle cx="12" cy="13" r="4"></circle>
                         </svg>
                         <span class="upload-subtext">Tap to select source</span>
-                        <input type="file" id="form-camera-file" class="hidden-file-input" accept="image/*" capture="environment">
-                        <input type="file" id="form-gallery-file" class="hidden-file-input" accept="image/*">
                     </div>
-
+                    <input type="file" id="form-camera-file" class="hidden-file-input" accept="image/*" capture="environment">
+                    <input type="file" id="form-gallery-file" class="hidden-file-input" accept="image/*">
                     <!-- Image Preview Area -->
                     <div id="preview-wrapper" class="upload-preview-wrapper">
                         <img id="image-preview" src="" alt="Bag photo preview" class="upload-preview">
