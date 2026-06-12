@@ -710,13 +710,13 @@ function setupEventListeners() {
     elements.btnSourceCancel.addEventListener('click', closeActionSheet);
 
     elements.btnSourceCamera.addEventListener('click', () => {
-        closeActionSheet();
         elements.formCameraFile.click();
+        closeActionSheet();
     });
 
     elements.btnSourceGallery.addEventListener('click', () => {
-        closeActionSheet();
         elements.formGalleryFile.click();
+        closeActionSheet();
     });
 
     // File change listeners
