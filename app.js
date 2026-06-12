@@ -455,7 +455,7 @@ async function handleFormSubmit(e) {
             const uploadUrl = `${rootDomain}/storage/v1/object/Dal%20Photos/${fileName}`;
             
             const uploadResponse = await fetch(uploadUrl, {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'apikey': SUPABASE_KEY,
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -466,7 +466,9 @@ async function handleFormSubmit(e) {
             
             if (!uploadResponse.ok) {
                 const errText = await uploadResponse.text();
-                throw new Error(`Storage Upload Failed: ${uploadResponse.status} - ${errText}`);
+                const errSummary = `Storage Upload Failed: ${uploadResponse.status} on URL ${uploadUrl} - ${errText || 'No response body'}`;
+                console.error(errSummary);
+                throw new Error(errSummary);
             }
             
             // Construct the public URL for the storage bucket
