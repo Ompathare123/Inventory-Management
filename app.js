@@ -800,4 +800,22 @@ async function init() {
     }
 }
 
+// 18. GLOBAL ERROR LOGGER FOR REMOTE MOBILE DEBUGGING
+window.addEventListener('error', function(e) {
+    const errorMsg = `JS Error: ${e.message} at ${e.filename.split('/').pop()}:${e.lineno}`;
+    if (typeof showToast === 'function') {
+        showToast(errorMsg);
+    } else {
+        alert(errorMsg);
+    }
+});
+window.addEventListener('unhandledrejection', function(e) {
+    const errorMsg = `Promise Rejected: ${e.reason}`;
+    if (typeof showToast === 'function') {
+        showToast(errorMsg);
+    } else {
+        alert(errorMsg);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', init);
