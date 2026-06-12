@@ -5,7 +5,8 @@
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
-    "dev": "node api/index.js"
+    "dev": "node api/index.js",
+    "build": "echo 'build success'"
   },
   "dependencies": {
     "express": "^4.19.2",
