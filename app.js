@@ -155,7 +155,7 @@ async function loadPeopleData() {
             phone: row.phone_number,
             category: row.dal_category,
             photo: row.photo_url,
-            createdDate: row.created_at
+            createdDate: parseSupabaseDate(row.created_at)
         }));
         console.log("Loaded People", state.people);
     } catch (err) {
@@ -637,6 +637,21 @@ function showToast(message) {
 }
 
 // 15. DATE AND TIME FORMATTERS
+function parseSupabaseDate(dateStr) {
+    if (!dateStr) return new Date();
+    
+    // Supabase returns timestamps without timezone offset if stored as TIMESTAMP.
+    // Since PostgreSQL database defaults to UTC, we append 'Z' to force parsing as UTC.
+    let normalizedStr = dateStr;
+    if (typeof dateStr === 'string') {
+        normalizedStr = dateStr.trim().replace(' ', 'T');
+        if (!normalizedStr.endsWith('Z') && !/[+-]\d{2}(:\d{2})?$/.test(normalizedStr)) {
+            normalizedStr += 'Z';
+        }
+    }
+    return new Date(normalizedStr);
+}
+
 function formatFullDate(date) {
     const options = { 
         day: '2-digit', 
