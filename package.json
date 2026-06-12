@@ -5,8 +5,7 @@
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
-    "dev": "node api/index.js",
-    "build": "echo 'No build step required'"
+    "dev": "node api/index.js"
   },
   "dependencies": {
     "express": "^4.19.2",
