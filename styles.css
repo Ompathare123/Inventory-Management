@@ -562,7 +562,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .modal-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -582,16 +582,17 @@ h1, h2, h3, h4, h5 {
 }
 
 .modal-sheet {
-    position: absolute;
-    left: 0;
-    right: 0;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, 100%);
     bottom: 0;
+    width: 100%;
+    max-width: var(--app-max-width);
     background-color: var(--bg-app);
     border-top-left-radius: var(--radius-lg);
     border-top-right-radius: var(--radius-lg);
     padding: 20px 24px 32px 24px;
     box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
-    transform: translateY(100%);
     transition: transform var(--transition-normal);
     z-index: 101;
     max-height: 85vh;
@@ -600,7 +601,7 @@ h1, h2, h3, h4, h5 {
 
 .modal-overlay.active + .modal-sheet,
 .modal-sheet.active {
-    transform: translateY(0);
+    transform: translate(-50%, 0);
 }
 
 /* Sheet Handle Indicator */
