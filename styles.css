@@ -138,6 +138,25 @@ h1, h2, h3, h4, h5 {
     box-shadow: 0 1px 3px rgba(180, 83, 9, 0.15);
 }
 
+.header-download-btn {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: var(--transition-fast);
+}
+
+.header-download-btn:active {
+    transform: scale(0.92);
+    background-color: #F3EFE9;
+}
+
 .app-title {
     font-size: 20px;
     font-weight: 700;

@@ -7,7 +7,7 @@
     <!-- Meta tags for SEO & PWA potential -->
     <meta name="description" content="A premium mobile-first inventory management application for various dal types including Toor, Moong, Urad, Chana, and Masoor.">
     <meta name="theme-color" content="#D97706">
-    <link rel="stylesheet" href="styles.css?v=13">
+    <link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
 
@@ -27,6 +27,13 @@
                 <h1 id="app-title" class="app-title">Dal Manager</h1>
             </div>
             <div class="header-right">
+                <button id="header-download-btn" class="header-download-btn" aria-label="Download PDF report">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
                 <button id="header-add-btn" class="header-add-btn" style="display: none;" aria-label="Add record">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -204,7 +211,9 @@
 
     </div>
 
+    <!-- jsPDF Library for report generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Script Application Logic -->
-    <script src="app.js?v=13"></script>
+    <script src="app.js?v=14"></script>
 </body>
 </html>

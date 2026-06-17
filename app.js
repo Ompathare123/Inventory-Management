@@ -45,6 +45,7 @@ const elements = {
     clearSearch: document.getElementById('clear-search'),
     peopleList: document.getElementById('people-list'),
     headerAddBtn: document.getElementById('header-add-btn'),
+    headerDownloadBtn: document.getElementById('header-download-btn'),
     
     // Modals
     modalOverlay: document.getElementById('modal-overlay'),
@@ -177,12 +178,14 @@ function navigateTo(page, categoryId = null) {
     if (page === 'home') {
         if (elements.backBtn) elements.backBtn.style.display = 'none';
         if (elements.headerAddBtn) elements.headerAddBtn.style.display = 'none';
+        if (elements.headerDownloadBtn) elements.headerDownloadBtn.style.display = 'flex';
         if (elements.appTitle) elements.appTitle.textContent = "Dal Manager";
         if (elements.homeView) elements.homeView.classList.add('active');
         renderDashboard();
     } else if (page === 'category') {
         if (elements.backBtn) elements.backBtn.style.display = 'flex';
         if (elements.headerAddBtn) elements.headerAddBtn.style.display = 'flex';
+        if (elements.headerDownloadBtn) elements.headerDownloadBtn.style.display = 'none';
         if (elements.appTitle) elements.appTitle.textContent = `${categoryId} Dal`;
         if (elements.categoryView) elements.categoryView.classList.add('active');
         
@@ -646,6 +649,153 @@ function showToast(message) {
     }, 3000);
 }
 
+// 15b. PDF REPORT GENERATOR
+function downloadPDFReport() {
+    try {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            showToast("PDF Library loading. Please try again in a moment.");
+            return;
+        }
+        
+        showLoading("Generating PDF Report...");
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+        
+        let y = 20;
+        
+        // Helper to check page bounds and auto-add page
+        const checkPageSpace = (neededHeight) => {
+            if (y + neededHeight > 277) {
+                doc.addPage();
+                y = 20;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text("Dal Manager - Inventory Report", 15, 12);
+                doc.setDrawColor(230, 225, 218);
+                doc.setLineWidth(0.2);
+                doc.line(15, 14, 195, 14);
+            }
+        };
+        
+        // --- 1. TITLE / HEADER SECTION ---
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.setTextColor(30, 37, 43); // Deep charcoal
+        doc.text("Dal Manager", 15, y);
+        
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(107, 114, 128); // Muted gray
+        doc.text("Inventory Management Report", 15, y + 6);
+        
+        // Date and stats
+        const dateStr = formatFullDate(new Date());
+        doc.setFontSize(9);
+        doc.text(`Generated on: ${dateStr}`, 15, y + 12);
+        doc.text(`Total Records: ${state.people.length} people`, 15, y + 17);
+        
+        // Draw decorative double border or line below header
+        doc.setDrawColor(217, 119, 6); // Orange primary
+        doc.setLineWidth(1);
+        doc.line(15, y + 21, 195, y + 21);
+        
+        doc.setDrawColor(234, 229, 221); // Soft border
+        doc.setLineWidth(0.5);
+        doc.line(15, y + 23, 195, y + 23);
+        
+        y += 30;
+        
+        // --- 2. CATEGORIES LOOP ---
+        CATEGORIES.forEach(cat => {
+            const peopleInCat = state.people.filter(p => p.category === cat.id);
+            peopleInCat.sort((a, b) => a.name.localeCompare(b.name));
+            
+            // Check page space for Category Heading + Table Header + at least 1 row (about 30mm)
+            checkPageSpace(30);
+            
+            // Draw Category Header Banner
+            doc.setFillColor(254, 243, 199); // Light yellow/amber background
+            doc.rect(15, y, 180, 8, "F");
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(180, 83, 9); // Primary dark
+            doc.text(`${cat.name} (${peopleInCat.length} ${peopleInCat.length === 1 ? 'person' : 'people'})`, 18, y + 5.5);
+            
+            y += 12;
+            
+            if (peopleInCat.length === 0) {
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(10);
+                doc.setTextColor(150, 150, 150);
+                doc.text("No records found in this category.", 18, y);
+                y += 10;
+            } else {
+                // Draw Table Headers
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(30, 37, 43);
+                doc.text("Name", 18, y);
+                doc.text("Phone Number", 120, y);
+                
+                doc.setDrawColor(230, 225, 218);
+                doc.setLineWidth(0.3);
+                doc.line(15, y + 2, 195, y + 2);
+                
+                y += 7;
+                
+                // Draw Table Rows
+                peopleInCat.forEach((person, idx) => {
+                    checkPageSpace(10);
+                    
+                    // Alternating row background for clean look
+                    if (idx % 2 === 0) {
+                        doc.setFillColor(250, 248, 245); // Warm soft white/cream
+                        doc.rect(15, y - 5, 180, 8, "F");
+                    }
+                    
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.setTextColor(30, 37, 43);
+                    
+                    // Truncate name if it's too long for the cell
+                    let displayName = person.name;
+                    if (displayName.length > 40) {
+                        displayName = displayName.substring(0, 37) + "...";
+                    }
+                    
+                    doc.text(displayName, 18, y);
+                    doc.text(person.phone, 120, y);
+                    
+                    // Light bottom row border
+                    doc.setDrawColor(240, 238, 234);
+                    doc.setLineWidth(0.2);
+                    doc.line(15, y + 3, 195, y + 3);
+                    
+                    y += 8;
+                });
+                
+                y += 4; // Extra space after table
+            }
+        });
+        
+        // Save the generated document
+        doc.save(`Dal_Manager_Report_${Date.now()}.pdf`);
+        showToast("PDF report downloaded successfully.");
+    } catch (error) {
+        console.error("PDF generation failed:", error);
+        showToast("Failed to generate PDF: " + error.message);
+    } finally {
+        hideLoading();
+    }
+}
+
 // 15. DATE AND TIME FORMATTERS
 function parseSupabaseDate(dateStr) {
     if (!dateStr) return new Date();
@@ -725,6 +875,7 @@ function setupEventListeners() {
     });
     
     safeAddListener(elements.headerAddBtn, 'click', openAddForm);
+    safeAddListener(elements.headerDownloadBtn, 'click', downloadPDFReport);
     safeAddListener(elements.closeModal, 'click', closeModal);
     safeAddListener(elements.btnCancel, 'click', closeModal);
     safeAddListener(elements.modalOverlay, 'click', closeModal);
