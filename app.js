@@ -171,25 +171,25 @@ function navigateTo(page, categoryId = null) {
     state.currentPage = page;
     state.activeCategory = categoryId;
     
-    elements.homeView.classList.remove('active');
-    elements.categoryView.classList.remove('active');
+    if (elements.homeView) elements.homeView.classList.remove('active');
+    if (elements.categoryView) elements.categoryView.classList.remove('active');
     
     if (page === 'home') {
-        elements.backBtn.style.display = 'none';
-        elements.headerAddBtn.style.display = 'none';
-        elements.appTitle.textContent = "Dal Manager";
-        elements.homeView.classList.add('active');
+        if (elements.backBtn) elements.backBtn.style.display = 'none';
+        if (elements.headerAddBtn) elements.headerAddBtn.style.display = 'none';
+        if (elements.appTitle) elements.appTitle.textContent = "Dal Manager";
+        if (elements.homeView) elements.homeView.classList.add('active');
         renderDashboard();
     } else if (page === 'category') {
-        elements.backBtn.style.display = 'flex';
-        elements.headerAddBtn.style.display = 'flex';
-        elements.appTitle.textContent = `${categoryId} Dal`;
-        elements.categoryView.classList.add('active');
+        if (elements.backBtn) elements.backBtn.style.display = 'flex';
+        if (elements.headerAddBtn) elements.headerAddBtn.style.display = 'flex';
+        if (elements.appTitle) elements.appTitle.textContent = `${categoryId} Dal`;
+        if (elements.categoryView) elements.categoryView.classList.add('active');
         
         // Reset search field
-        elements.searchInput.value = '';
+        if (elements.searchInput) elements.searchInput.value = '';
         state.searchQuery = '';
-        elements.clearSearch.style.display = 'none';
+        if (elements.clearSearch) elements.clearSearch.style.display = 'none';
         
         renderCategoryList();
     }
@@ -198,55 +198,57 @@ function navigateTo(page, categoryId = null) {
 // 8. DASHBOARD RENDERER
 function renderDashboard() {
     console.log("Rendering Categories", state.people);
-    elements.statTotalRecords.textContent = state.people.length;
+    if (elements.statTotalRecords) elements.statTotalRecords.textContent = state.people.length;
     
     if (state.people.length > 0) {
         const sorted = [...state.people].sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
         const latestDate = new Date(sorted[0].createdDate);
-        elements.statLastUpdated.textContent = formatTimeAgo(latestDate);
+        if (elements.statLastUpdated) elements.statLastUpdated.textContent = formatTimeAgo(latestDate);
     } else {
-        elements.statLastUpdated.textContent = "No Activity";
+        if (elements.statLastUpdated) elements.statLastUpdated.textContent = "No Activity";
     }
     
-    elements.categoryList.innerHTML = '';
-    CATEGORIES.forEach(cat => {
-        const count = state.people.filter(p => p.category === cat.id).length;
-        
-        const card = document.createElement('div');
-        card.className = 'category-card';
-        card.setAttribute('data-category', cat.id);
-        
-        const avatarLetter = cat.id.charAt(0);
-        const avatarClass = cat.id.toLowerCase();
-        
-        card.innerHTML = `
-            <div class="card-info">
-                <div class="category-avatar ${avatarClass}">${avatarLetter}</div>
-                <div>
-                    <div class="category-name">${cat.id}</div>
-                    <div class="category-desc">${cat.desc}</div>
+    if (elements.categoryList) {
+        elements.categoryList.innerHTML = '';
+        CATEGORIES.forEach(cat => {
+            const count = state.people.filter(p => p.category === cat.id).length;
+            
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.setAttribute('data-category', cat.id);
+            
+            const avatarLetter = cat.id.charAt(0);
+            const avatarClass = cat.id.toLowerCase();
+            
+            card.innerHTML = `
+                <div class="card-info">
+                    <div class="category-avatar ${avatarClass}">${avatarLetter}</div>
+                    <div>
+                        <div class="category-name">${cat.id}</div>
+                        <div class="category-desc">${cat.desc}</div>
+                    </div>
                 </div>
-            </div>
-            <div class="card-arrow">
-                <span class="record-badge">${count} ${count === 1 ? 'person' : 'people'}</span>
-                <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-            </div>
-        `;
-        
-        card.addEventListener('click', () => {
-            navigateTo('category', cat.id);
+                <div class="card-arrow">
+                    <span class="record-badge">${count} ${count === 1 ? 'person' : 'people'}</span>
+                    <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => {
+                navigateTo('category', cat.id);
+            });
+            
+            elements.categoryList.appendChild(card);
         });
-        
-        elements.categoryList.appendChild(card);
-    });
+    }
     console.log("[renderDashboard] Successfully rendered main category grid.");
 }
 
 // 9. CATEGORY LIST RENDERER (PEOPLE LIST)
 function renderCategoryList() {
-    elements.peopleList.innerHTML = '';
+    if (elements.peopleList) elements.peopleList.innerHTML = '';
     
     let filteredList = state.people.filter(p => p.category === state.activeCategory);
     
@@ -263,72 +265,74 @@ function renderCategoryList() {
         return;
     }
     
-    filteredList.forEach(person => {
-        const card = document.createElement('div');
-        card.className = 'person-card';
-        card.setAttribute('data-id', person.id);
-        
-        const displayPhoto = person.photo || DEFAULT_BAG_SVG;
-        const formattedDate = formatFullDate(new Date(person.createdDate));
-        
-        card.innerHTML = `
-            <div class="bag-photo-wrapper" title="Tap to zoom">
-                <img class="bag-photo" src="${displayPhoto}" alt="${person.name}'s bag" onerror="this.src='${DEFAULT_BAG_SVG}'">
-            </div>
-            <div class="person-details">
-                <div>
-                    <h4 class="person-name">${person.name}</h4>
-                    <a href="tel:${person.phone}" class="person-phone" title="Call ${person.name}">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                        </svg>
-                        ${person.phone}
-                    </a>
-                    <div class="person-date" title="Created date">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        <span>${formattedDate}</span>
+    if (elements.peopleList) {
+        filteredList.forEach(person => {
+            const card = document.createElement('div');
+            card.className = 'person-card';
+            card.setAttribute('data-id', person.id);
+            
+            const displayPhoto = person.photo || DEFAULT_BAG_SVG;
+            const formattedDate = formatFullDate(new Date(person.createdDate));
+            
+            card.innerHTML = `
+                <div class="bag-photo-wrapper" title="Tap to zoom">
+                    <img class="bag-photo" src="${displayPhoto}" alt="${person.name}'s bag" onerror="this.src='${DEFAULT_BAG_SVG}'">
+                </div>
+                <div class="person-details">
+                    <div>
+                        <h4 class="person-name">${person.name}</h4>
+                        <a href="tel:${person.phone}" class="person-phone" title="Call ${person.name}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            ${person.phone}
+                        </a>
+                        <div class="person-date" title="Created date">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>${formattedDate}</span>
+                        </div>
+                    </div>
+                    <div class="person-actions">
+                        <button class="action-btn edit">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Edit
+                        </button>
+                        <button class="action-btn delete">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            Delete
+                        </button>
                     </div>
                 </div>
-                <div class="person-actions">
-                    <button class="action-btn edit">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                        Edit
-                    </button>
-                    <button class="action-btn delete">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                        Delete
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Setup direct click listeners to prevent string injection/escaping issues in onclick tags
-        const editBtn = card.querySelector('.action-btn.edit');
-        const deleteBtn = card.querySelector('.action-btn.delete');
-        const photoWrapper = card.querySelector('.bag-photo-wrapper');
-        
-        editBtn.addEventListener('click', () => openEditForm(person.id));
-        deleteBtn.addEventListener('click', () => deleteRecord(person.id));
-        photoWrapper.addEventListener('click', () => {
-            const displayPhoto = person.photo || DEFAULT_BAG_SVG;
-            zoomImage(displayPhoto);
+            `;
+            
+            // Setup direct click listeners to prevent string injection/escaping issues in onclick tags
+            const editBtn = card.querySelector('.action-btn.edit');
+            const deleteBtn = card.querySelector('.action-btn.delete');
+            const photoWrapper = card.querySelector('.bag-photo-wrapper');
+            
+            if (editBtn) editBtn.addEventListener('click', () => openEditForm(person.id));
+            if (deleteBtn) deleteBtn.addEventListener('click', () => deleteRecord(person.id));
+            if (photoWrapper) photoWrapper.addEventListener('click', () => {
+                const displayPhoto = person.photo || DEFAULT_BAG_SVG;
+                zoomImage(displayPhoto);
+            });
+            
+            elements.peopleList.appendChild(card);
         });
-        
-        elements.peopleList.appendChild(card);
-    });
+    }
     
     console.log(`[renderCategoryList] Successfully rendered ${filteredList.length} record cards for category: ${state.activeCategory}`);
 }
@@ -350,24 +354,26 @@ function renderEmptyState() {
     `;
     
     const title = isSearch ? "No Search Matches" : "Category is Empty";
-    const desc = isSearch ? "Try checking spelling or type a different query." : `Tap the "+" button below to add the first person to ${state.activeCategory} category.`;
+    const desc = isSearch ? "Try checking spelling or type a different query." : `Tap the "+" button at the top right to add the first person to ${state.activeCategory} category.`;
     
-    elements.peopleList.innerHTML = `
-        <div class="empty-state">
-            <div class="empty-state-icon">${icon}</div>
-            <h4 class="empty-state-title">${title}</h4>
-            <p class="empty-state-desc">${desc}</p>
-        </div>
-    `;
+    if (elements.peopleList) {
+        elements.peopleList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">${icon}</div>
+                <h4 class="empty-state-title">${title}</h4>
+                <p class="empty-state-desc">${desc}</p>
+            </div>
+        `;
+    }
 }
 
 // 10. FORM MODAL CONTROLLERS
 function openAddForm() {
     state.editingRecordId = null;
-    elements.formModalTitle.textContent = "Add Record";
-    elements.editRecordId.value = '';
-    elements.formName.value = '';
-    elements.formPhone.value = '';
+    if (elements.formModalTitle) elements.formModalTitle.textContent = "Add Record";
+    if (elements.editRecordId) elements.editRecordId.value = '';
+    if (elements.formName) elements.formName.value = '';
+    if (elements.formPhone) elements.formPhone.value = '';
     
     resetPhotoPreview();
     openModal();
@@ -378,10 +384,10 @@ window.openEditForm = function(recordId) {
     if (!record) return;
     
     state.editingRecordId = recordId;
-    elements.formModalTitle.textContent = "Edit Record";
-    elements.editRecordId.value = recordId;
-    elements.formName.value = record.name;
-    elements.formPhone.value = record.phone;
+    if (elements.formModalTitle) elements.formModalTitle.textContent = "Edit Record";
+    if (elements.editRecordId) elements.editRecordId.value = recordId;
+    if (elements.formName) elements.formName.value = record.name;
+    if (elements.formPhone) elements.formPhone.value = record.phone;
     
     // Clear newly selected photo blob
     state.selectedPhotoBlob = null;
@@ -389,9 +395,9 @@ window.openEditForm = function(recordId) {
     // Show current photo
     if (record.photo) {
         state.existingPhotoUrl = record.photo;
-        elements.imagePreview.src = record.photo;
-        elements.uploadBox.style.display = 'none';
-        elements.previewWrapper.style.display = 'block';
+        if (elements.imagePreview) elements.imagePreview.src = record.photo;
+        if (elements.uploadBox) elements.uploadBox.style.display = 'none';
+        if (elements.previewWrapper) elements.previewWrapper.style.display = 'block';
     } else {
         resetPhotoPreview();
     }
@@ -400,25 +406,25 @@ window.openEditForm = function(recordId) {
 };
 
 function openModal() {
-    elements.modalOverlay.classList.add('active');
-    elements.formModal.classList.add('active');
+    if (elements.modalOverlay) elements.modalOverlay.classList.add('active');
+    if (elements.formModal) elements.formModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
-    elements.modalOverlay.classList.remove('active');
-    elements.formModal.classList.remove('active');
+    if (elements.modalOverlay) elements.modalOverlay.classList.remove('active');
+    if (elements.formModal) elements.formModal.classList.remove('active');
     document.body.style.overflow = '';
 }
 
 function resetPhotoPreview() {
     state.selectedPhotoBlob = null;
     state.existingPhotoUrl = '';
-    elements.formCameraFile.value = '';
-    elements.formGalleryFile.value = '';
-    elements.imagePreview.src = '';
-    elements.uploadBox.style.display = 'flex';
-    elements.previewWrapper.style.display = 'none';
+    if (elements.formCameraFile) elements.formCameraFile.value = '';
+    if (elements.formGalleryFile) elements.formGalleryFile.value = '';
+    if (elements.imagePreview) elements.imagePreview.src = '';
+    if (elements.uploadBox) elements.uploadBox.style.display = 'flex';
+    if (elements.previewWrapper) elements.previewWrapper.style.display = 'none';
 }
 
 async function handleFormSubmit(e) {
@@ -686,86 +692,98 @@ function formatTimeAgo(date) {
 
 // 16. EVENT LISTENERS SETUP
 function setupEventListeners() {
-    elements.backBtn.addEventListener('click', () => {
+    const safeAddListener = (element, event, handler) => {
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`[setupEventListeners] Missing element for event: ${event}`);
+        }
+    };
+
+    safeAddListener(elements.backBtn, 'click', () => {
         navigateTo('home');
     });
     
-    elements.searchInput.addEventListener('input', (e) => {
+    safeAddListener(elements.searchInput, 'input', (e) => {
         state.searchQuery = e.target.value;
         if (state.searchQuery.trim() !== '') {
-            elements.clearSearch.style.display = 'flex';
+            if (elements.clearSearch) elements.clearSearch.style.display = 'flex';
         } else {
-            elements.clearSearch.style.display = 'none';
+            if (elements.clearSearch) elements.clearSearch.style.display = 'none';
         }
         renderCategoryList();
     });
     
-    elements.clearSearch.addEventListener('click', () => {
-        elements.searchInput.value = '';
+    safeAddListener(elements.clearSearch, 'click', () => {
+        if (elements.searchInput) {
+            elements.searchInput.value = '';
+            elements.searchInput.focus();
+        }
         state.searchQuery = '';
-        elements.clearSearch.style.display = 'none';
-        elements.searchInput.focus();
+        if (elements.clearSearch) elements.clearSearch.style.display = 'none';
         renderCategoryList();
     });
     
-    elements.headerAddBtn.addEventListener('click', openAddForm);
-    elements.closeModal.addEventListener('click', closeModal);
-    elements.btnCancel.addEventListener('click', closeModal);
-    elements.modalOverlay.addEventListener('click', closeModal);
-    elements.recordForm.addEventListener('submit', handleFormSubmit);
+    safeAddListener(elements.headerAddBtn, 'click', openAddForm);
+    safeAddListener(elements.closeModal, 'click', closeModal);
+    safeAddListener(elements.btnCancel, 'click', closeModal);
+    safeAddListener(elements.modalOverlay, 'click', closeModal);
+    safeAddListener(elements.recordForm, 'submit', handleFormSubmit);
     
     // Image selection source options sheet triggers
-    elements.uploadBox.addEventListener('click', () => {
-        elements.actionSheetOverlay.classList.add('active');
-        elements.photoActionSheet.classList.add('active');
+    safeAddListener(elements.uploadBox, 'click', () => {
+        if (elements.actionSheetOverlay) elements.actionSheetOverlay.classList.add('active');
+        if (elements.photoActionSheet) elements.photoActionSheet.classList.add('active');
     });
 
     const closeActionSheet = () => {
-        elements.actionSheetOverlay.classList.remove('active');
-        elements.photoActionSheet.classList.remove('active');
+        if (elements.actionSheetOverlay) elements.actionSheetOverlay.classList.remove('active');
+        if (elements.photoActionSheet) elements.photoActionSheet.classList.remove('active');
     };
 
-    elements.actionSheetOverlay.addEventListener('click', closeActionSheet);
-    elements.btnSourceCancel.addEventListener('click', closeActionSheet);
+    safeAddListener(elements.actionSheetOverlay, 'click', closeActionSheet);
+    safeAddListener(elements.btnSourceCancel, 'click', closeActionSheet);
 
-    elements.btnSourceCamera.addEventListener('click', () => {
-        elements.formCameraFile.click();
+    safeAddListener(elements.btnSourceCamera, 'click', () => {
+        if (elements.formCameraFile) elements.formCameraFile.click();
         closeActionSheet();
     });
 
-    elements.btnSourceGallery.addEventListener('click', () => {
-        elements.formGalleryFile.click();
+    safeAddListener(elements.btnSourceGallery, 'click', () => {
+        if (elements.formGalleryFile) elements.formGalleryFile.click();
         closeActionSheet();
     });
 
     // File change listeners
-    elements.formCameraFile.addEventListener('change', handleImageSelect);
-    elements.formGalleryFile.addEventListener('change', handleImageSelect);
-    elements.removePreviewBtn.addEventListener('click', resetPhotoPreview);
+    safeAddListener(elements.formCameraFile, 'change', handleImageSelect);
+    safeAddListener(elements.formGalleryFile, 'change', handleImageSelect);
+    safeAddListener(elements.removePreviewBtn, 'click', resetPhotoPreview);
     
-    elements.closeZoom.addEventListener('click', closeZoomModal);
-    elements.zoomModal.addEventListener('click', (e) => {
+    safeAddListener(elements.closeZoom, 'click', closeZoomModal);
+    safeAddListener(elements.zoomModal, 'click', (e) => {
         if (e.target === elements.zoomModal || e.target === elements.closeZoom) {
             closeZoomModal();
         }
     });
     
-    elements.uploadBox.addEventListener('dragover', (e) => {
+    safeAddListener(elements.uploadBox, 'dragover', (e) => {
         e.preventDefault();
-        elements.uploadBox.classList.add('drag-over');
+        if (elements.uploadBox) elements.uploadBox.classList.add('drag-over');
     });
     
-    elements.uploadBox.addEventListener('dragleave', () => {
-        elements.uploadBox.classList.remove('drag-over');
+    safeAddListener(elements.uploadBox, 'dragleave', () => {
+        if (elements.uploadBox) elements.uploadBox.classList.remove('drag-over');
     });
     
-    elements.uploadBox.addEventListener('drop', (e) => {
+    safeAddListener(elements.uploadBox, 'drop', (e) => {
         e.preventDefault();
-        elements.uploadBox.classList.remove('drag-over');
-        if (e.dataTransfer.files.length > 0) {
-            elements.formGalleryFile.files = e.dataTransfer.files;
-            const event = new Event('change');
-            elements.formGalleryFile.dispatchEvent(event);
+        if (elements.uploadBox) {
+            elements.uploadBox.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0 && elements.formGalleryFile) {
+                elements.formGalleryFile.files = e.dataTransfer.files;
+                const event = new Event('change');
+                elements.formGalleryFile.dispatchEvent(event);
+            }
         }
     });
 }
