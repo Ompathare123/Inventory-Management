@@ -652,146 +652,110 @@ function showToast(message) {
 // 15b. PDF REPORT GENERATOR
 function downloadPDFReport() {
     try {
-        if (!window.jspdf || !window.jspdf.jsPDF) {
+        if (!window.html2pdf) {
             showToast("PDF Library loading. Please try again in a moment.");
             return;
         }
         
         showLoading("Generating PDF Report...");
         
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        });
+        // 1. Create temporary container to style and compile HTML
+        const reportDiv = document.createElement('div');
+        reportDiv.style.padding = '20px';
+        reportDiv.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+        reportDiv.style.color = '#1E252B';
+        reportDiv.style.backgroundColor = '#FAF8F5';
+        reportDiv.style.width = '700px'; // fixed width for clean A4 layout scaling
         
-        let y = 20;
+        // 2. Build report header HTML
+        let htmlContent = `
+            <div style="margin-bottom: 24px; border-bottom: 3px double #D97706; padding-bottom: 12px;">
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 28px; margin: 0; color: #1E252B;">Dal Manager</h1>
+                <div style="font-size: 14px; color: #6B7280; margin-top: 4px;">Inventory Management Report</div>
+                <div style="font-size: 11px; color: #6B7280; margin-top: 8px; display: flex; justify-content: space-between;">
+                    <span>Generated on: ${formatFullDate(new Date())}</span>
+                    <span>Total Records: ${state.people.length} people</span>
+                </div>
+            </div>
+        `;
         
-        // Helper to check page bounds and auto-add page
-        const checkPageSpace = (neededHeight) => {
-            if (y + neededHeight > 277) {
-                doc.addPage();
-                y = 20;
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.setTextColor(150, 150, 150);
-                doc.text("Dal Manager - Inventory Report", 15, 12);
-                doc.setDrawColor(230, 225, 218);
-                doc.setLineWidth(0.2);
-                doc.line(15, 14, 195, 14);
-            }
-        };
-        
-        // --- 1. TITLE / HEADER SECTION ---
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(22);
-        doc.setTextColor(30, 37, 43); // Deep charcoal
-        doc.text("Dal Manager", 15, y);
-        
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(107, 114, 128); // Muted gray
-        doc.text("Inventory Management Report", 15, y + 6);
-        
-        // Date and stats
-        const dateStr = formatFullDate(new Date());
-        doc.setFontSize(9);
-        doc.text(`Generated on: ${dateStr}`, 15, y + 12);
-        doc.text(`Total Records: ${state.people.length} people`, 15, y + 17);
-        
-        // Draw decorative double border or line below header
-        doc.setDrawColor(217, 119, 6); // Orange primary
-        doc.setLineWidth(1);
-        doc.line(15, y + 21, 195, y + 21);
-        
-        doc.setDrawColor(234, 229, 221); // Soft border
-        doc.setLineWidth(0.5);
-        doc.line(15, y + 23, 195, y + 23);
-        
-        y += 30;
-        
-        // --- 2. CATEGORIES LOOP ---
+        // 3. Build category tables HTML
         CATEGORIES.forEach(cat => {
             const peopleInCat = state.people.filter(p => p.category === cat.id);
-            peopleInCat.sort((a, b) => a.name.localeCompare(b.name));
+            // Sort by locale mr (Marathi) to handle local language alphabetization properly
+            peopleInCat.sort((a, b) => a.name.localeCompare(b.name, 'mr'));
             
-            // Check page space for Category Heading + Table Header + at least 1 row (about 30mm)
-            checkPageSpace(30);
-            
-            // Draw Category Header Banner
-            doc.setFillColor(254, 243, 199); // Light yellow/amber background
-            doc.rect(15, y, 180, 8, "F");
-            
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor(180, 83, 9); // Primary dark
-            doc.text(`${cat.name} (${peopleInCat.length} ${peopleInCat.length === 1 ? 'person' : 'people'})`, 18, y + 5.5);
-            
-            y += 12;
+            htmlContent += `
+                <div style="margin-bottom: 24px; page-break-inside: avoid;">
+                    <div style="background-color: #FEF3C7; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 16px; margin: 0; color: #B45309;">${cat.name}</h3>
+                        <span style="font-size: 12px; font-weight: 600; color: #B45309; background-color: #FDE68A; padding: 2px 8px; border-radius: 12px;">
+                            ${peopleInCat.length} ${peopleInCat.length === 1 ? 'person' : 'people'}
+                        </span>
+                    </div>
+            `;
             
             if (peopleInCat.length === 0) {
-                doc.setFont("helvetica", "italic");
-                doc.setFontSize(10);
-                doc.setTextColor(150, 150, 150);
-                doc.text("No records found in this category.", 18, y);
-                y += 10;
+                htmlContent += `
+                    <div style="font-style: italic; color: #9CA3AF; padding: 10px; font-size: 13px;">
+                        No records found in this category.
+                    </div>
+                `;
             } else {
-                // Draw Table Headers
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(10);
-                doc.setTextColor(30, 37, 43);
-                doc.text("Name", 18, y);
-                doc.text("Phone Number", 120, y);
+                htmlContent += `
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 6px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #EAE5DD; text-align: left;">
+                                <th style="padding: 8px 10px; font-size: 12px; font-weight: 700; color: #4B5563;">Name</th>
+                                <th style="padding: 8px 10px; font-size: 12px; font-weight: 700; color: #4B5563;">Phone Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
                 
-                doc.setDrawColor(230, 225, 218);
-                doc.setLineWidth(0.3);
-                doc.line(15, y + 2, 195, y + 2);
-                
-                y += 7;
-                
-                // Draw Table Rows
                 peopleInCat.forEach((person, idx) => {
-                    checkPageSpace(10);
-                    
-                    // Alternating row background for clean look
-                    if (idx % 2 === 0) {
-                        doc.setFillColor(250, 248, 245); // Warm soft white/cream
-                        doc.rect(15, y - 5, 180, 8, "F");
-                    }
-                    
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(10);
-                    doc.setTextColor(30, 37, 43);
-                    
-                    // Truncate name if it's too long for the cell
-                    let displayName = person.name;
-                    if (displayName.length > 40) {
-                        displayName = displayName.substring(0, 37) + "...";
-                    }
-                    
-                    doc.text(displayName, 18, y);
-                    doc.text(person.phone, 120, y);
-                    
-                    // Light bottom row border
-                    doc.setDrawColor(240, 238, 234);
-                    doc.setLineWidth(0.2);
-                    doc.line(15, y + 3, 195, y + 3);
-                    
-                    y += 8;
+                    const rowBg = idx % 2 === 0 ? '#FFFFFF' : '#FAF8F5';
+                    htmlContent += `
+                        <tr style="background-color: ${rowBg}; border-bottom: 1px solid #FAF8F5;">
+                            <td style="padding: 8px 10px; font-size: 13px; color: #1E252B; font-weight: 500;">${person.name}</td>
+                            <td style="padding: 8px 10px; font-size: 13px; color: #1E252B; font-family: monospace;">${person.phone}</td>
+                        </tr>
+                    `;
                 });
                 
-                y += 4; // Extra space after table
+                htmlContent += `
+                        </tbody>
+                    </table>
+                `;
             }
+            
+            htmlContent += `</div>`; // Close category container
         });
         
-        // Save the generated document
-        doc.save(`Dal_Manager_Report_${Date.now()}.pdf`);
-        showToast("PDF report downloaded successfully.");
+        reportDiv.innerHTML = htmlContent;
+        
+        // 4. Configure html2pdf options (uses Canvas capture to bypass native PDF text font limitations)
+        const opt = {
+            margin:       10,
+            filename:     `Dal_Manager_Report_${Date.now()}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // 5. Generate and download
+        html2pdf().set(opt).from(reportDiv).save().then(() => {
+            showToast("PDF report downloaded successfully.");
+            hideLoading();
+        }).catch(err => {
+            console.error("PDF generation promise rejected:", err);
+            showToast("Failed to compile PDF: " + err.message);
+            hideLoading();
+        });
+        
     } catch (error) {
         console.error("PDF generation failed:", error);
         showToast("Failed to generate PDF: " + error.message);
-    } finally {
         hideLoading();
     }
 }
