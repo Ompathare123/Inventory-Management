@@ -7,7 +7,7 @@
     <!-- Meta tags for SEO & PWA potential -->
     <meta name="description" content="A premium mobile-first inventory management application for various dal types including Toor, Moong, Urad, Chana, and Masoor.">
     <meta name="theme-color" content="#D97706">
-    <link rel="stylesheet" href="styles.css?v=11">
+    <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
 
@@ -100,7 +100,7 @@
             <div class="sheet-handle"></div>
             
             <div class="modal-header">
-                <h3 class="modal-title" id="form-modal-title">Add New Entry</h3>
+                <h3 class="modal-title" id="form-modal-title">Add Record</h3>
                 <button id="close-modal" class="close-modal-btn" aria-label="Close form">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -130,11 +130,12 @@
                     <label class="form-label">Bag Photo</label>
                     
                     <div id="upload-box" class="upload-container">
-                        <svg class="upload-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="upload-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                             <circle cx="12" cy="13" r="4"></circle>
                         </svg>
-                        <span class="upload-subtext">Tap to select source</span>
+                        <span class="upload-text">Upload Bag Photo</span>
+                        <span class="upload-subtext">Tap to select or capture camera image</span>
                     </div>
                     <input type="file" id="form-camera-file" class="hidden-file-input" accept="image/*" capture="environment">
                     <input type="file" id="form-gallery-file" class="hidden-file-input" accept="image/*">
@@ -204,6 +205,6 @@
     </div>
 
     <!-- Script Application Logic -->
-    <script src="app.js?v=11"></script>
+    <script src="app.js?v=12"></script>
 </body>
 </html>

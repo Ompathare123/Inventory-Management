@@ -656,7 +656,7 @@ h1, h2, h3, h4, h5 {
     width: 100%;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
     padding: 12px 14px;
     font-family: var(--font-body);
     font-size: 14px;
@@ -699,13 +699,14 @@ h1, h2, h3, h4, h5 {
 }
 
 .upload-text {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-primary);
-    font-weight: 500;
+    font-weight: 600;
+    margin-top: 4px;
 }
 
 .upload-subtext {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-secondary);
 }
 
@@ -767,7 +768,7 @@ h1, h2, h3, h4, h5 {
 .btn {
     flex: 1;
     padding: 14px;
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
     font-family: var(--font-body);
     font-size: 14px;
     font-weight: 600;
@@ -788,7 +789,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background-color: var(--primary);
     color: white;
     box-shadow: 0 4px 6px rgba(180, 83, 9, 0.15);
 }
