@@ -860,12 +860,12 @@ h1, h2, h3, h4, h5 {
 
 /* Fullscreen Photo Modal for zooming in on bag photo */
 .fullscreen-photo-modal {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.95);
     z-index: 300;
     display: flex;
     align-items: center;
@@ -881,8 +881,8 @@ h1, h2, h3, h4, h5 {
 }
 
 .fullscreen-photo {
-    max-width: 90%;
-    max-height: 80%;
+    max-width: 92%;
+    max-height: 82%;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     border: 2px solid rgba(255, 255, 255, 0.1);
@@ -890,8 +890,8 @@ h1, h2, h3, h4, h5 {
 
 .close-fullscreen-btn {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: env(safe-area-inset-top, 24px);
+    right: env(safe-area-inset-right, 24px);
     background: none;
     border: none;
     color: white;
@@ -900,14 +900,17 @@ h1, h2, h3, h4, h5 {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color var(--transition-fast);
 }
 
 .close-fullscreen-btn:active {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Loading Overlay & Spinner styles */
