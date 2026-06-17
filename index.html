@@ -7,7 +7,7 @@
     <!-- Meta tags for SEO & PWA potential -->
     <meta name="description" content="A premium mobile-first inventory management application for various dal types including Toor, Moong, Urad, Chana, and Masoor.">
     <meta name="theme-color" content="#D97706">
-    <link rel="stylesheet" href="styles.css?v=7">
+    <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
 
@@ -27,7 +27,12 @@
                 <h1 id="app-title" class="app-title">Dal Manager</h1>
             </div>
             <div class="header-right">
-                <span class="brand-badge">Premium</span>
+                <button id="header-add-btn" class="header-add-btn" style="display: none;" aria-label="Add record">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
             </div>
         </header>
 
@@ -79,13 +84,7 @@
                     <!-- Dynamic rendering in JS -->
                 </div>
 
-                <!-- Floating Add Button (+) -->
-                <button id="fab-add" class="fab" aria-label="Add record">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                </button>
+
             </div>
 
         </main>
@@ -205,6 +204,6 @@
     </div>
 
     <!-- Script Application Logic -->
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
 </body>
 </html>

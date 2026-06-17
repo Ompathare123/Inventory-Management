@@ -44,7 +44,7 @@ const elements = {
     searchInput: document.getElementById('search-input'),
     clearSearch: document.getElementById('clear-search'),
     peopleList: document.getElementById('people-list'),
-    fabAdd: document.getElementById('fab-add'),
+    headerAddBtn: document.getElementById('header-add-btn'),
     
     // Modals
     modalOverlay: document.getElementById('modal-overlay'),
@@ -176,11 +176,13 @@ function navigateTo(page, categoryId = null) {
     
     if (page === 'home') {
         elements.backBtn.style.display = 'none';
+        elements.headerAddBtn.style.display = 'none';
         elements.appTitle.textContent = "Dal Manager";
         elements.homeView.classList.add('active');
         renderDashboard();
     } else if (page === 'category') {
         elements.backBtn.style.display = 'flex';
+        elements.headerAddBtn.style.display = 'flex';
         elements.appTitle.textContent = `${categoryId} Dal`;
         elements.categoryView.classList.add('active');
         
@@ -706,7 +708,7 @@ function setupEventListeners() {
         renderCategoryList();
     });
     
-    elements.fabAdd.addEventListener('click', openAddForm);
+    elements.headerAddBtn.addEventListener('click', openAddForm);
     elements.closeModal.addEventListener('click', closeModal);
     elements.btnCancel.addEventListener('click', closeModal);
     elements.modalOverlay.addEventListener('click', closeModal);
