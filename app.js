@@ -153,7 +153,7 @@ async function loadPeopleData() {
         state.people = data.map(row => ({
             id: row.id,
             name: row.name,
-            phone: row.phone_number,
+            phone: row.phone_number || '',
             category: row.dal_category,
             photo: row.photo_url,
             createdDate: parseSupabaseDate(row.created_at)
@@ -276,6 +276,14 @@ function renderCategoryList() {
             
             const displayPhoto = person.photo || DEFAULT_BAG_SVG;
             const formattedDate = formatFullDate(new Date(person.createdDate));
+            const phoneHtml = person.phone ? `
+                <a href="tel:${person.phone}" class="person-phone" title="Call ${person.name}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    ${person.phone}
+                </a>
+            ` : '';
             
             card.innerHTML = `
                 <div class="bag-photo-wrapper" title="Tap to zoom">
@@ -284,12 +292,7 @@ function renderCategoryList() {
                 <div class="person-details">
                     <div>
                         <h4 class="person-name">${person.name}</h4>
-                        <a href="tel:${person.phone}" class="person-phone" title="Call ${person.name}">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                            </svg>
-                            ${person.phone}
-                        </a>
+                        ${phoneHtml}
                         <div class="person-date" title="Created date">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -441,17 +444,19 @@ async function handleFormSubmit(e) {
     console.log(`- Form values - Name: "${name}", Phone: "${phone}", editRecordId: "${recordId}"`);
     console.log(`- Active Category: "${state.activeCategory}"`);
     
-    if (!name || !phone) {
-        console.error("[handleFormSubmit Validation Error] Required fields missing.");
-        showToast("Please fill all required fields.");
+    if (!name) {
+        console.error("[handleFormSubmit Validation Error] Name is required.");
+        showToast("Please enter a name.");
         return;
     }
     
-    const phoneDigits = phone.replace(/\D/g, '');
-    if (phoneDigits.length < 8) {
-        console.error("[handleFormSubmit Validation Error] Phone number too short.");
-        showToast("Please enter a valid phone number.");
-        return;
+    if (phone) {
+        const phoneDigits = phone.replace(/\D/g, '');
+        if (phoneDigits.length < 8) {
+            console.error("[handleFormSubmit Validation Error] Phone number too short.");
+            showToast("Please enter a valid phone number.");
+            return;
+        }
     }
     
     showLoading("Saving to Supabase Cloud...");
